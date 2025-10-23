@@ -1,4 +1,4 @@
-import { Outlet, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import Navbar from "../components/Navbar";
 import Dashboard from "../pages/Dashboard";
@@ -9,10 +9,10 @@ import Report from "../pages/Report";
 import Panduan from "../pages/Panduan";
 import Setting from "../pages/Setting";
 
-export default function MainLayout() {
+export default function MainLayout({ userData, setIsLoggedIn }) {
     return (
         <div className="min-h-screen flex flex-col">
-            <TopBar />
+            <TopBar userData={userData} setIsLoggedIn={setIsLoggedIn} />
             <Navbar />
             <main className="flex-1 p-6 bg-gray-100">
                 <Routes>

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
@@ -7,26 +8,50 @@ import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
-  const isAuthenticated = localStorage.getItem("loggedIn") === "true";
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("loggedIn") === "true"
+  );
+  const [userData, setUserData] = useState(
+    JSON.parse(localStorage.getItem("userData")) || null
+  );
+
+  // Pastikan state sinkron dengan localStorage
+  useEffect(() => {
+    if (isLoggedIn) {
+      localStorage.setItem("loggedIn", "true");
+      if (userData) localStorage.setItem("userData", JSON.stringify(userData));
+    } else {
+      localStorage.removeItem("loggedIn");
+      localStorage.removeItem("userData");
+    }
+  }, [isLoggedIn, userData]);
 
   return (
     <Routes>
       <Route
         path="/"
         element={
-          isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+          isLoggedIn ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
         }
       />
-      <Route path="/login" element={<Login />} />
+
+      <Route
+        path="/login"
+        element={<Login setIsLoggedIn={setIsLoggedIn} setUserData={setUserData} />}
+      />
+
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* Dashboard & menu di dalam ProtectedRoute */}
       <Route
         path="/dashboard/*"
         element={
           <ProtectedRoute>
-            <MainLayout />
+            <MainLayout
+              userData={userData}
+              setIsLoggedIn={setIsLoggedIn}
+              setUserData={setUserData}
+            />
           </ProtectedRoute>
         }
       />
