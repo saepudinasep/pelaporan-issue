@@ -13,7 +13,7 @@ export default function MainLayout({ userData, setIsLoggedIn }) {
     return (
         <div className="min-h-screen flex flex-col">
             <TopBar userData={userData} setIsLoggedIn={setIsLoggedIn} />
-            <Navbar />
+            <Navbar userData={userData} />
             <main className="flex-1 p-6 bg-gray-100">
                 <Routes>
                     <Route index element={<Dashboard />} />
