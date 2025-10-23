@@ -25,6 +25,13 @@ export default function MainLayout({ userData, setIsLoggedIn }) {
                     <Route path="setting" element={<Setting />} />
                 </Routes>
             </main>
+
+            {/* Footer */}
+            <footer className="bg-gray-100">
+                <p className="text-center text-xs text-gray-400 pt-2 pb-4">
+                    © 2025 - {new Date().getFullYear()} Marketing Development Sub Division V1.10.23.2025
+                </p>
+            </footer>
         </div>
     );
 }
