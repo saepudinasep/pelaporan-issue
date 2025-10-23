@@ -1,9 +1,24 @@
+import Swal from "sweetalert2";
+
 export default function TopBar({ userData, setIsLoggedIn }) {
     const handleLogout = () => {
-        localStorage.removeItem("loggedIn");
-        localStorage.removeItem("userData");
-        setIsLoggedIn(false);
-        window.location.href = "/login";
+        Swal.fire({
+            title: "Konfirmasi Logout",
+            text: "Apakah Anda yakin ingin logout?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#EF4444",
+            cancelButtonColor: "#6366F1",
+            confirmButtonText: "Ya, logout",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem("loggedIn");
+                localStorage.removeItem("userData");
+                setIsLoggedIn(false);
+                window.location.href = "/login";
+            }
+        });
     };
 
     // Ambil nama user dari props atau localStorage fallback
