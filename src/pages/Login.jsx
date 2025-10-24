@@ -238,6 +238,8 @@ export default function Login() {
 
             const user = result.data;
 
+            console.log(user);
+
             const defaultPassword = getDefaultPassword(user.NAME_KTP, user.NIK);
             if (user.password?.toLowerCase() === defaultPassword.toLowerCase()) {
                 localStorage.setItem("pendingReset", JSON.stringify(user));
@@ -265,6 +267,7 @@ export default function Login() {
 
             console.log(result.success);
             console.log(result.message);
+            console.log(userData);
 
             Swal.fire({
                 title: "Login Berhasil!",

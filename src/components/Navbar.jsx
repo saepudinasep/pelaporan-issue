@@ -7,9 +7,27 @@ export default function Navbar({ userData }) {
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [user, setUser] = useState(userData || null); // 🔹 lokal state untuk user
 
-    const isHeadOffice = userData?.cabang.toLowerCase() === "kantor pusat";
+    // 🔹 Load ulang user dari localStorage saat komponen dimount
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("userData"));
+        if (storedUser) {
+            setUser(storedUser);
+        }
+    }, [userData]); // akan dijalankan juga setiap userData berubah
 
+    // 🔹 Deteksi scroll untuk efek blur/shadow navbar
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 10);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    // 🔹 Tentukan apakah user dari Head Office
+    const isHeadOffice = user?.cabang?.toLowerCase() === "kantor pusat";
+
+    // 🔹 Menu dinamis berdasarkan cabang
     const navItems = isHeadOffice
         ? [
             { name: "Dashboard", path: "/dashboard" },
@@ -27,12 +45,6 @@ export default function Navbar({ userData }) {
         ];
 
     const isActive = (path) => location.pathname === path;
-
-    useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 10);
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
 
     return (
         <nav
