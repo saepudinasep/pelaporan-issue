@@ -48,6 +48,7 @@ export default function Setting({ userData, setIsLoggedIn }) {
             const data = await res.json();
             if (data.success) {
                 console.log(data.success);
+                console.log(data.message);
                 Swal.fire({
                     title: "Berhasil!",
                     text: "Password berhasil diperbarui. Silakan login kembali.",
@@ -78,8 +79,8 @@ export default function Setting({ userData, setIsLoggedIn }) {
         <div className="relative w-full max-w-3xl mx-auto mt-10 px-4">
             {/* Overlay Loading Spinner */}
             {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-50 rounded-lg">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
+                <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[9999]">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-500 border-t-transparent"></div>
                 </div>
             )}
 
