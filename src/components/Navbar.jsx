@@ -8,7 +8,7 @@ export default function Navbar({ userData }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
-    const isHeadOffice = userData?.cabang === "Kantor Pusat";
+    const isHeadOffice = userData?.cabang.toLowerCase() === "kantor pusat";
 
     const navItems = isHeadOffice
         ? [
