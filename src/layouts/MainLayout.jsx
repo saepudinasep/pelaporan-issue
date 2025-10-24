@@ -22,7 +22,7 @@ export default function MainLayout({ userData, setIsLoggedIn }) {
                     <Route path="ticket/:id" element={<DetailTicket />} />
                     <Route path="report" element={<Report />} />
                     <Route path="panduan" element={<Panduan />} />
-                    <Route path="setting" element={<Setting />} />
+                    <Route path="setting" element={<Setting userData={userData} setIsLoggedIn={setIsLoggedIn} />} />
                 </Routes>
             </main>
 
