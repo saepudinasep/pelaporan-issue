@@ -188,3 +188,151 @@ export default function Login() {
         </div>
     );
 }
+
+// import { useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+// import Swal from "sweetalert2";
+// import axios from "axios";
+// import logo from "../assets/Logo.png";
+// import { getDefaultPassword } from "../utils/getDefaultPassword";
+
+// export default function Login() {
+//     const [username, setUsername] = useState("");
+//     const [password, setPassword] = useState("");
+//     const [loading, setLoading] = useState(false);
+//     const navigate = useNavigate();
+
+//     const API_LOGIN_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AKfycbyuYgNONWLt-IAP_EO_TUyE9mgxiyNlE2qp2n57QsQx9yse2rzaxsAbtQhYakRyYakOHQ"; // ganti dengan URL Apps Script
+
+//     useEffect(() => {
+//         if (localStorage.getItem("loggedIn") === "true") {
+//             navigate("/dashboard");
+//         }
+//     }, [navigate]);
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         setLoading(true);
+
+//         try {
+//             const response = await axios.post(API_LOGIN_URL, { username, password });
+//             const data = response.data;
+
+//             if (!data.success) {
+//                 setLoading(false);
+//                 Swal.fire({
+//                     title: "Login Gagal!",
+//                     text: data.message,
+//                     icon: "error",
+//                     confirmButtonColor: "#6366F1",
+//                 });
+//                 return;
+//             }
+
+//             const user = data.data;
+
+//             // Cek default password
+//             const defaultPassword = getDefaultPassword(user.name, user.nik);
+//             if (password.toLowerCase() === defaultPassword.toLowerCase()) {
+//                 localStorage.setItem("pendingReset", JSON.stringify(user));
+//                 Swal.fire({
+//                     title: "Password Default",
+//                     text: "Silakan ubah password Anda terlebih dahulu.",
+//                     icon: "info",
+//                 }).then(() => navigate("/reset-password"));
+//                 setLoading(false);
+//                 return;
+//             }
+
+//             localStorage.setItem("loggedIn", "true");
+//             localStorage.setItem("userData", JSON.stringify(user));
+
+//             Swal.fire({
+//                 title: "Login Berhasil!",
+//                 text: `Selamat datang, ${user.name}! 👋`,
+//                 icon: "success",
+//                 timer: 1500,
+//                 showConfirmButton: false,
+//             });
+
+//             setTimeout(() => {
+//                 setLoading(false);
+//                 navigate("/dashboard");
+//             }, 1500);
+//         } catch (err) {
+//             console.error("DEBUG ERROR FETCH:", err);
+//             setLoading(false);
+//             Swal.fire({
+//                 title: "Error",
+//                 text: "Gagal memuat data login. Periksa koneksi atau API Apps Script.",
+//                 icon: "error",
+//             });
+//         }
+//     };
+
+//     return (
+//         <div className="relative flex min-h-screen items-center justify-center bg-white px-6 py-12">
+//             {loading && (
+//                 <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-50">
+//                     <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
+//                 </div>
+//             )}
+
+//             <div className="w-full max-w-sm bg-white shadow-lg rounded-xl p-8">
+//                 <div className="flex flex-col items-center text-center">
+//                     <img src={logo} alt="Logo" className="h-16 w-auto mb-3" />
+//                     <h1 className="text-xl font-semibold text-gray-800">WOM Finance</h1>
+//                     <p className="text-sm text-gray-500 mb-6">Support Listing Issue System</p>
+//                 </div>
+
+//                 <form onSubmit={handleSubmit} className="space-y-6">
+//                     <div>
+//                         <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+//                             Username
+//                         </label>
+//                         <input
+//                             id="username"
+//                             type="text"
+//                             required
+//                             value={username}
+//                             onChange={(e) => setUsername(e.target.value)}
+//                             className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm"
+//                         />
+//                     </div>
+
+//                     <div>
+//                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+//                             Password
+//                         </label>
+//                         <input
+//                             id="password"
+//                             type="password"
+//                             required
+//                             value={password}
+//                             onChange={(e) => setPassword(e.target.value)}
+//                             className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm"
+//                         />
+//                     </div>
+
+//                     <button
+//                         type="submit"
+//                         className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400"
+//                     >
+//                         Sign in
+//                     </button>
+
+//                     <div className="text-right">
+//                         <a href="/forgot-password" className="text-sm text-indigo-500 hover:underline">
+//                             Lupa Password?
+//                         </a>
+//                     </div>
+//                 </form>
+
+//                 <p className="text-center text-xs text-gray-400 pt-2">
+//                     © 2025 - {new Date().getFullYear()} Marketing Development Sub Division V1.0.07.2025
+//                 </p>
+//             </div>
+//         </div>
+//     );
+// }
+
