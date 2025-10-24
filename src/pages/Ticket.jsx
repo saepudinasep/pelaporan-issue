@@ -1,72 +1,44 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import TicketTable from "../components/TicketTable";
-import Papa from "papaparse";
 import Swal from "sweetalert2";
 
-export default function Ticket({ userData }) {
-    const navigate = useNavigate();
+export default function Ticket({ userData, openTicketDetail }) {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const CSV_URL =
-        "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCB9-Y2Ph95JfTA0jTgDZ1hD0E2HvfAILtxI7RiCvS-6Q7Uaww5nIXVQOLdg7NVE5O0TQx3giAFrUM/pub?gid=1708544896&single=true&output=csv"; // ganti dengan CSV publik
-
+    // Ambil data dari Apps Script API
     useEffect(() => {
         const fetchTickets = async () => {
             try {
-                setLoading(true);
-                const res = await fetch(CSV_URL);
-                if (!res.ok) throw new Error("Gagal fetch CSV");
-                const csvText = await res.text();
-
-                // parse CSV
-                const { data, errors } = Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                });
-
-                if (errors.length) {
-                    console.error(errors);
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "Terjadi kesalahan saat memproses data tiket.",
-                    });
-                }
-
-                // Map kolom agar sesuai TicketTable
-                const mappedTickets = data.map((row) => {
-                    // Ambil tanggal saja dari Timestamp
-                    let createDate = row["Timestamp"] || "-";
-                    if (createDate !== "-") {
-                        createDate = createDate.split(" ")[0]; // ambil bagian tanggal saja
-                    }
-
-                    return {
-                        createDate,
+                const response = await fetch(
+                    "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhcmQ7gRtH7HWLKIkwBpgoDyM_sjOV40RVLa5BMknG3zNleV_9aXnfsLRwE_niyakrbdd0149OhKZjrTv34OOWsZqyXuAET4B9jOc2RYrHsQZ-0OVkrepIKaigLt9nVQ1f8OqBNv8H7OcV6vzKRCrfI4lb1dH8fYdOzP9nAeHMrdgukESwXMtAe-JQ3J7b6sue1PAuP6oUbdOnR1jnuvVNfSZzdO5PkL3Q861Pr_hB-BYKdFCW8v1SphZbKFUOYDPLGs1Bjx4TCAEMvMnzC-0eiZBIv3C0XhnQhEkgN&lib=MTqZ9NHwUWnc8hGUQnOrqUJrQcJ2HCqVX"
+                );
+                const json = await response.json();
+                if (json.data) {
+                    // Map data supaya cocok format TicketTable
+                    const mapped = json.data.map((row) => ({
                         ticketId: row["Ticket ID"] || "-",
+                        createDate: row["Timestamp"]
+                            ? new Date(row["Timestamp"]).toLocaleDateString()
+                            : "-",
                         errorSystem: row["Kendala System"] || "-",
-                        brand: row["Brand"] || "-",
                         status: row["Status Ticket"] || "-",
-                    };
-                });
-
-                // Urutkan dari terbaru ke terlama
-                mappedTickets.sort((a, b) => {
-                    if (a.createDate === "-" || !a.createDate) return 1;
-                    if (b.createDate === "-" || !b.createDate) return -1;
-                    return new Date(b.createDate) - new Date(a.createDate);
-                });
-
-
-                setTickets(mappedTickets);
+                        brand: row["Brand"] || "-",
+                    }));
+                    // Urutkan dari terbaru
+                    mapped.sort(
+                        (a, b) => new Date(b.createDate) - new Date(a.createDate)
+                    );
+                    setTickets(mapped);
+                } else {
+                    setTickets([]);
+                }
             } catch (err) {
                 console.error(err);
                 Swal.fire({
                     icon: "error",
-                    title: "Error",
-                    text: err.message,
+                    title: "Gagal Memuat Tiket",
+                    text: "Terjadi kesalahan saat mengambil data tiket.",
                 });
             } finally {
                 setLoading(false);
@@ -76,21 +48,7 @@ export default function Ticket({ userData }) {
         fetchTickets();
     }, []);
 
-    const openTicketDetail = (ticketId) => {
-        navigate(`/dashboard/ticket/${ticketId}`);
-    };
+    if (loading) return <p className="text-center py-6">Memuat tiket...</p>;
 
-    return (
-        <div>
-            {loading ? (
-                <div className="text-center py-10">Loading tickets...</div>
-            ) : (
-                <TicketTable
-                    tickets={tickets}
-                    userData={userData}
-                    openTicketDetail={openTicketDetail}
-                />
-            )}
-        </div>
-    );
+    return <TicketTable tickets={tickets} userData={userData} openTicketDetail={openTicketDetail} />;
 }

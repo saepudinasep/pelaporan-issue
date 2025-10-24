@@ -78,8 +78,8 @@ export default function TicketTable({ tickets, userData, openTicketDetail }) {
                         <button
                             key={status}
                             className={`px-4 py-1 rounded-full text-sm sm:text-xs font-medium border transition-colors duration-200 ${statusFilter === status
-                                    ? "bg-blue-500 text-white border-blue-500"
-                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                ? "bg-blue-500 text-white border-blue-500"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                                 }`}
                             onClick={() => setStatusFilter(status)}
                         >
@@ -159,8 +159,8 @@ export default function TicketTable({ tickets, userData, openTicketDetail }) {
                         <button
                             key={i + 1}
                             className={`px-3 py-1 rounded-full text-sm sm:text-xs border transition-colors duration-200 ${currentPage === i + 1
-                                    ? "bg-blue-500 text-white border-blue-500"
-                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                ? "bg-blue-500 text-white border-blue-500"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                                 }`}
                             onClick={() => setCurrentPage(i + 1)}
                         >
