@@ -304,14 +304,14 @@ export default function Login() {
                         WOM Finance
                     </h1>
                     <p className="text-sm text-gray-500 mb-6">
-                        Support Listing Issue System
+                        Support Listing Issue System Marketing
                     </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                            Username
+                            NIK Karyawan
                         </label>
                         <input
                             id="username"

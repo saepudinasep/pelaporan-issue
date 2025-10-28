@@ -7,27 +7,32 @@ export default function Navbar({ userData }) {
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const [user, setUser] = useState(userData || null); // 🔹 lokal state untuk user
+    const [user, setUser] = useState(userData || null);
 
-    // 🔹 Load ulang user dari localStorage saat komponen dimount
+    // 🔹 1. Load ulang user dari localStorage saat komponen dimount
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("userData"));
-        if (storedUser) {
-            setUser(storedUser);
-        }
-    }, [userData]); // akan dijalankan juga setiap userData berubah
+        if (storedUser) setUser(storedUser);
+    }, [userData]); // update kalau prop userData berubah (misal habis login)
 
-    // 🔹 Deteksi scroll untuk efek blur/shadow navbar
+    // 🔹 2. Tambahkan event listener scroll
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 10);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // 🔹 Tentukan apakah user dari Head Office
+    // 🔹 3. Jika belum ada user (belum login), redirect ke /login
+    useEffect(() => {
+        if (!user) {
+            const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+            if (!isLoggedIn) navigate("/login");
+        }
+    }, [user, navigate]);
+
+    // 🔹 Logic menu Head Office atau cabang
     const isHeadOffice = user?.cabang?.toLowerCase() === "kantor pusat";
 
-    // 🔹 Menu dinamis berdasarkan cabang
     const navItems = isHeadOffice
         ? [
             { name: "Dashboard", path: "/dashboard" },
@@ -49,8 +54,8 @@ export default function Navbar({ userData }) {
     return (
         <nav
             className={`sticky top-0 z-50 transition-all duration-300 backdrop-blur-md ${isScrolled
-                ? "bg-white/70 shadow-sm border-b border-gray-200"
-                : "bg-white"
+                    ? "bg-white/70 shadow-sm border-b border-gray-200"
+                    : "bg-white"
                 }`}
         >
             <div className="flex justify-between items-center px-6 py-4 md:justify-center">
@@ -76,8 +81,8 @@ export default function Navbar({ userData }) {
                             key={item.path}
                             onClick={() => navigate(item.path)}
                             className={`cursor-pointer px-3 py-1.5 text-lg font-medium transition-all duration-200 ${isActive(item.path)
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-800 hover:text-blue-500 hover:border-b-2 hover:border-blue-300"
+                                    ? "text-blue-600 border-b-2 border-blue-600"
+                                    : "text-gray-800 hover:text-blue-500 hover:border-b-2 hover:border-blue-300"
                                 }`}
                         >
                             {item.name}
@@ -96,8 +101,8 @@ export default function Navbar({ userData }) {
                                 setMenuOpen(false);
                             }}
                             className={`cursor-pointer w-full text-center py-2 text-lg font-medium transition-colors duration-200 ${isActive(item.path)
-                                ? "text-blue-600 bg-blue-50"
-                                : "text-gray-800 hover:text-blue-500 hover:bg-gray-100"
+                                    ? "text-blue-600 bg-blue-50"
+                                    : "text-gray-800 hover:text-blue-500 hover:bg-gray-100"
                                 }`}
                         >
                             {item.name}
