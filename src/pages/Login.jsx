@@ -260,6 +260,7 @@ export default function Login() {
                 position: user.POSITION_NAME,
                 product: user.PRODUCT,
                 status: user.EMPLOYEE_STATUS,
+                akses: user.AKSES,
             };
 
             localStorage.setItem("loggedIn", "true");

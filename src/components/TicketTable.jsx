@@ -23,19 +23,24 @@ export default function TicketTable({ tickets, userData, openTicketDetail }) {
             } else {
                 filtered = filtered.filter(
                     (t) =>
-                        (t.ticketId || "").replace(/\D/g, "") === searchInput.trim()
+                        (t.ticketId || "").replace(/\D/g, "") ===
+                        searchInput.trim()
                 );
             }
         }
 
         if (statusFilter !== "All") {
             filtered = filtered.filter(
-                (t) => (t.status || "").toLowerCase() === statusFilter.toLowerCase()
+                (t) =>
+                    (t.status || "").toLowerCase() ===
+                    statusFilter.toLowerCase()
             );
         }
 
-        // Urutkan dari createDate terbaru ke terlama
-        filtered.sort((a, b) => new Date(b.createDate) - new Date(a.createDate));
+        // Urutkan dari tanggal terbaru
+        filtered.sort(
+            (a, b) => new Date(b.createDate) - new Date(a.createDate)
+        );
 
         setFilteredTickets(filtered);
         setCurrentPage(1);
@@ -78,8 +83,8 @@ export default function TicketTable({ tickets, userData, openTicketDetail }) {
                         <button
                             key={status}
                             className={`px-4 py-1 rounded-full text-sm sm:text-xs font-medium border transition-colors duration-200 ${statusFilter === status
-                                ? "bg-blue-500 text-white border-blue-500"
-                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                    ? "bg-blue-500 text-white border-blue-500"
+                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                                 }`}
                             onClick={() => setStatusFilter(status)}
                         >
@@ -128,13 +133,23 @@ export default function TicketTable({ tickets, userData, openTicketDetail }) {
                                 <tr
                                     key={ticket.ticketId}
                                     className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-                                    onClick={() => openTicketDetail(ticket.ticketId)}
+                                    onClick={() =>
+                                        openTicketDetail(ticket.ticketId)
+                                    }
                                 >
-                                    <td className="px-4 py-2">{ticket.createDate || "-"}</td>
-                                    <td className="px-4 py-2 font-medium text-blue-600">{ticket.ticketId}</td>
-                                    <td className="px-4 py-2">{ticket.errorSystem || "-"}</td>
+                                    <td className="px-4 py-2">
+                                        {ticket.createDate || "-"}
+                                    </td>
+                                    <td className="px-4 py-2 font-medium text-blue-600">
+                                        {ticket.ticketId}
+                                    </td>
+                                    <td className="px-4 py-2">
+                                        {ticket.errorSystem || "-"}
+                                    </td>
                                     {isHeadOffice && (
-                                        <td className="px-4 py-2">{ticket.brand || "-"}</td>
+                                        <td className="px-4 py-2">
+                                            {ticket.brand || "-"}
+                                        </td>
                                     )}
                                     <td className="px-4 py-2">
                                         <span
@@ -159,8 +174,8 @@ export default function TicketTable({ tickets, userData, openTicketDetail }) {
                         <button
                             key={i + 1}
                             className={`px-3 py-1 rounded-full text-sm sm:text-xs border transition-colors duration-200 ${currentPage === i + 1
-                                ? "bg-blue-500 text-white border-blue-500"
-                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                    ? "bg-blue-500 text-white border-blue-500"
+                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                                 }`}
                             onClick={() => setCurrentPage(i + 1)}
                         >
