@@ -23,7 +23,7 @@ export default function DetailTicket() {
         async function fetchTicket() {
             try {
                 const res = await fetch(
-                    `https://script.google.com/macros/s/AKfycbz0CVw-zTk2EcDg62ekrkU4sEnXS8uOEDcKsLfqF9e2_ziElSqd1tGcf2tVOIHXoO9i/exec?action=getTicket&id=${id}`
+                    `https://script.google.com/macros/s/AKfycbwBeqKp4Ubfjf6YxvamfKqcHz0Yeapd5p3eJr0yPSdYsDj0yIgi4sn-K7NbcN3K6-Ya/exec?action=getTicket&id=${id}`
                 );
                 const json = await res.json();
                 const dataTicket = json.data;
@@ -43,7 +43,9 @@ export default function DetailTicket() {
     }, [id]);
 
     if (loading)
-        return <p className="text-center py-6 text-gray-500">Memuat tiket...</p>;
+        return (<div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
+        </div>);
 
     if (!ticket)
         return (
@@ -60,7 +62,7 @@ export default function DetailTicket() {
                 const base64 = reader.result.split(",")[1];
                 try {
                     const res = await fetch(
-                        "https://script.google.com/macros/s/AKfycbz0CVw-zTk2EcDg62ekrkU4sEnXS8uOEDcKsLfqF9e2_ziElSqd1tGcf2tVOIHXoO9i/exec",
+                        "https://script.google.com/macros/s/AKfycbwBeqKp4Ubfjf6YxvamfKqcHz0Yeapd5p3eJr0yPSdYsDj0yIgi4sn-K7NbcN3K6-Ya/exec",
                         {
                             method: "POST",
                             // mode: "no-cors",
@@ -106,7 +108,7 @@ export default function DetailTicket() {
             }
 
             await fetch(
-                "https://script.google.com/macros/s/AKfycbz0CVw-zTk2EcDg62ekrkU4sEnXS8uOEDcKsLfqF9e2_ziElSqd1tGcf2tVOIHXoO9i/exec",
+                "https://script.google.com/macros/s/AKfycbwBeqKp4Ubfjf6YxvamfKqcHz0Yeapd5p3eJr0yPSdYsDj0yIgi4sn-K7NbcN3K6-Ya/exec",
                 {
                     method: "POST",
                     // mode: "no-cors",
@@ -145,7 +147,7 @@ export default function DetailTicket() {
 
         try {
             await fetch(
-                "https://script.google.com/macros/s/AKfycbz0CVw-zTk2EcDg62ekrkU4sEnXS8uOEDcKsLfqF9e2_ziElSqd1tGcf2tVOIHXoO9i/exec",
+                "https://script.google.com/macros/s/AKfycbwBeqKp4Ubfjf6YxvamfKqcHz0Yeapd5p3eJr0yPSdYsDj0yIgi4sn-K7NbcN3K6-Ya/exec",
                 {
                     method: "POST",
                     // mode: "no-cors",
@@ -177,7 +179,7 @@ export default function DetailTicket() {
                     <h4 className="font-semibold text-blue-600 mb-3">Informasi Pemohon</h4>
                     <div className="space-y-1 text-gray-700">
                         <p><strong>Nama Pemohon:</strong> {ticket["CreatedBy(Name)"]}</p>
-                        <p><strong>NIK:</strong> {ticket["CreatedBy(Name)"]}</p>
+                        <p><strong>NIK:</strong> {ticket["CreatedBy(NIK)"]}</p>
                         <p><strong>Jabatan:</strong> {ticket["Position"]}</p>
                         <p>
                             <strong>Request Date:</strong>{" "}
@@ -188,11 +190,11 @@ export default function DetailTicket() {
                         <p>
                             <strong>Status Ticket:</strong>{" "}
                             <span
-                                className={`px-2 py-1 rounded text-white ${ticket["StatusTicket"] === "Closed"
+                                className={`px-2 py-1 rounded text-white ${ticket["StatusTicket"] === "Open"
                                     ? "bg-green-500"
                                     : ticket["StatusTicket"] === "Reject"
                                         ? "bg-red-500"
-                                        : "bg-yellow-500"
+                                        : "bg-gray-500"
                                     }`}
                             >
                                 {ticket["StatusTicket"]}
@@ -227,7 +229,7 @@ export default function DetailTicket() {
 
                         <div>
                             <strong>Upload:</strong>{" "}
-                            {ticket.file ? (
+                            {ticket["FileUploadLink"] ? (
                                 <a
                                     href={ticket["FileUploadLink"]}
                                     target="_blank"
@@ -248,7 +250,7 @@ export default function DetailTicket() {
             <div className="bg-white rounded-lg shadow mt-8 p-5">
                 <h4 className="font-semibold text-gray-700 mb-3">💬 Historical Chat</h4>
                 <div className="max-h-80 overflow-y-auto border p-3 rounded space-y-3">
-                    {chat.length === 0 ? (
+                    {/* {chat.length === 0 ? (
                         <p className="text-gray-500 text-center">Belum ada chat.</p>
                     ) : (
                         chat.map((msg, i) => (
@@ -260,6 +262,41 @@ export default function DetailTicket() {
                                 </small>
                             </div>
                         ))
+                    )} */}
+                    {chat.length > 0 ? (
+                        chat.map((c, i) => (
+                            <div
+                                key={i}
+                                className={`mb-2 ${c.senderNIK === user.nik
+                                    ? "text-right"
+                                    : "text-left"
+                                    }`}
+                            >
+                                <p className="text-sm">
+                                    <strong>{c.sender}</strong>{" "}
+                                    <span className="text-gray-400">
+                                        ({new Date(c.time).toLocaleString("id-ID")})
+                                    </span>
+                                </p>
+                                <p className="bg-white inline-block px-3 py-1 rounded shadow-sm">
+                                    {c.message}
+                                    {c.file && (
+                                        <a
+                                            href={c.file}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="block text-blue-500 underline mt-1 text-xs"
+                                        >
+                                            📎 Lihat File
+                                        </a>
+                                    )}
+                                </p>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-gray-500 text-center text-sm">
+                            Belum ada percakapan.
+                        </p>
                     )}
                 </div>
             </div>
