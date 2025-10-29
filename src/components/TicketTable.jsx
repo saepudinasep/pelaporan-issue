@@ -42,9 +42,15 @@ export default function TicketTable({ tickets, userData }) {
         }
 
         // Urutkan dari tanggal terbaru
-        filtered.sort(
-            (a, b) => new Date(b.createDate) - new Date(a.createDate)
-        );
+        filtered.sort((a, b) => {
+            const [dayA, monthA, yearA] = a.createDate.split("/");
+            const [dayB, monthB, yearB] = b.createDate.split("/");
+            const dateA = Date.UTC(yearA, monthA - 1, dayA);
+            const dateB = Date.UTC(yearB, monthB - 1, dayB);
+            return dateB - dateA;
+        });
+
+        console.log(filtered);
 
         setFilteredTickets(filtered);
         setCurrentPage(1);

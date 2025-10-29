@@ -246,57 +246,59 @@ export default function DetailTicket() {
                 </div>
             </div>
 
-            {/* Chat Section */}
-            <div className="bg-white rounded-lg shadow mt-8 p-5">
-                <h4 className="font-semibold text-gray-700 mb-3">💬 Historical Chat</h4>
-                <div className="max-h-80 overflow-y-auto border p-3 rounded space-y-3">
-                    {/* {chat.length === 0 ? (
-                        <p className="text-gray-500 text-center">Belum ada chat.</p>
-                    ) : (
-                        chat.map((msg, i) => (
-                            <div key={i} className="border-b pb-2">
-                                <p className="font-semibold text-blue-600">{msg.sender}</p>
-                                <p className="text-gray-700">{msg.message}</p>
-                                <small className="text-gray-400">
-                                    {new Date(msg.time).toLocaleString("id-ID")}
-                                </small>
-                            </div>
-                        ))
-                    )} */}
+            {/* 💬 Historical Chat Section */}
+            <div className="bg-white rounded-xl shadow mt-8 p-5">
+                <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    💬 <span>Historical Chat</span>
+                </h4>
+
+                <div className="max-h-96 overflow-y-auto border rounded-lg p-4 bg-gray-50 space-y-3">
                     {chat.length > 0 ? (
-                        chat.map((c, i) => (
-                            <div
-                                key={i}
-                                className={`mb-2 ${c.senderNIK === user.nik
-                                    ? "text-right"
-                                    : "text-left"
-                                    }`}
-                            >
-                                <p className="text-sm">
-                                    <strong>{c.sender}</strong>{" "}
-                                    <span className="text-gray-400">
-                                        ({new Date(c.time).toLocaleString("id-ID")})
-                                    </span>
-                                </p>
-                                <p className="bg-white inline-block px-3 py-1 rounded shadow-sm">
-                                    {c.message}
-                                    {c.file && (
-                                        <a
-                                            href={c.file}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="block text-blue-500 underline mt-1 text-xs"
+                        chat.map((c, i) => {
+                            const isUser = c.senderNIK === user.nik;
+                            return (
+                                <div
+                                    key={i}
+                                    className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+                                >
+                                    <div
+                                        className={`max-w-[75%] p-3 rounded-2xl shadow-sm relative ${isUser
+                                            ? "bg-indigo-500 text-white rounded-tr-none"
+                                            : "bg-white text-gray-800 rounded-tl-none"
+                                            }`}
+                                    >
+                                        <p className="text-sm leading-snug wrap-break-word">{c.message}</p>
+
+                                        {c.file && (
+                                            <a
+                                                href={c.file}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className={`block mt-1 text-xs underline ${isUser ? "text-indigo-200" : "text-blue-500"
+                                                    }`}
+                                            >
+                                                📎 Lihat File
+                                            </a>
+                                        )}
+
+                                        <div
+                                            className={`text-[10px] mt-1 ${isUser ? "text-indigo-200 text-right" : "text-gray-400"
+                                                }`}
                                         >
-                                            📎 Lihat File
-                                        </a>
-                                    )}
-                                </p>
-                            </div>
-                        ))
+                                            {c.sender} •{" "}
+                                            {new Date(c.time).toLocaleString("id-ID", {
+                                                dateStyle: "short",
+                                                timeStyle: "short",
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
                     ) : (
-                        <p className="text-gray-500 text-center text-sm">
+                        <div className="text-gray-500 text-center text-sm py-10">
                             Belum ada percakapan.
-                        </p>
+                        </div>
                     )}
                 </div>
             </div>
