@@ -23,7 +23,7 @@ export default function DetailTicket() {
         async function fetchTicket() {
             try {
                 const res = await fetch(
-                    `https://script.google.com/macros/s/AKfycbwBeqKp4Ubfjf6YxvamfKqcHz0Yeapd5p3eJr0yPSdYsDj0yIgi4sn-K7NbcN3K6-Ya/exec?action=getTicket&id=${id}`
+                    `https://script.google.com/macros/s/AKfycbz5mAyke9tqt6DYWt13o8f5cIo_D4jTFDNkuuvXGi7lP3dqxi1OclBRA2P22UTOZigd/exec?action=getTicket&id=${id}`
                 );
                 const json = await res.json();
                 const dataTicket = json.data;
@@ -54,7 +54,7 @@ export default function DetailTicket() {
             </p>
         );
 
-    // === Upload file base64 ke folder dinamis (Link Folder Ticket) ===
+    // === Upload file base64 ke Apps Script ===
     const uploadFileBase = async (file, folderUrl) => {
         const reader = new FileReader();
         return new Promise((resolve, reject) => {
@@ -62,20 +62,21 @@ export default function DetailTicket() {
                 const base64 = reader.result.split(",")[1];
                 try {
                     const res = await fetch(
-                        "https://script.google.com/macros/s/AKfycbwBeqKp4Ubfjf6YxvamfKqcHz0Yeapd5p3eJr0yPSdYsDj0yIgi4sn-K7NbcN3K6-Ya/exec",
+                        "https://script.google.com/macros/s/AKfycbz5mAyke9tqt6DYWt13o8f5cIo_D4jTFDNkuuvXGi7lP3dqxi1OclBRA2P22UTOZigd/exec",
                         {
                             method: "POST",
-                            // mode: "no-cors",
                             // headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 action: "uploadFileBase",
-                                folderUrl, // folder dinamis dari Link Folder Ticket
+                                folderUrl,
                                 filename: file.name,
                                 filedata: base64,
                             }),
                         }
                     );
-                    resolve(res);
+                    const json = await res.json();
+                    if (json.success) resolve(json.fileUrl);
+                    else reject(json.message);
                 } catch (err) {
                     reject(err);
                 }
@@ -99,19 +100,15 @@ export default function DetailTicket() {
         });
 
         try {
-            let uploadedFileUrl = null;
-
-            // Jika user upload file
+            let uploadedFileUrl = "";
             if (file) {
-                await uploadFileBase(file, ticket["FileUploadLink"]);
-                uploadedFileUrl = `File: ${file.name}`;
+                uploadedFileUrl = await uploadFileBase(file, ticket["LinkFolderTicket"]);
             }
 
-            await fetch(
-                "https://script.google.com/macros/s/AKfycbwBeqKp4Ubfjf6YxvamfKqcHz0Yeapd5p3eJr0yPSdYsDj0yIgi4sn-K7NbcN3K6-Ya/exec",
+            const resChat = await fetch(
+                "https://script.google.com/macros/s/AKfycbz5mAyke9tqt6DYWt13o8f5cIo_D4jTFDNkuuvXGi7lP3dqxi1OclBRA2P22UTOZigd/exec",
                 {
                     method: "POST",
-                    // mode: "no-cors",
                     // headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         action: "sendChat",
@@ -126,12 +123,17 @@ export default function DetailTicket() {
                 }
             );
 
-            Swal.fire("Berhasil", "Pesan terkirim", "success");
-            setMessage("");
-            setFile(null);
+            const data = await resChat.json();
+            if (data.success) {
+                Swal.fire("Berhasil", "Pesan terkirim", "success");
+                setMessage("");
+                setFile(null);
+            } else {
+                Swal.fire("Error", "Gagal kirim chat", "error");
+            }
         } catch (error) {
-            Swal.fire("Error", "Gagal mengirim pesan", "error");
-            console.error("Gagal memuat tiket:", error);
+            console.error(error);
+            Swal.fire("Error", "Gagal upload/kirim chat", "error");
         }
     };
 
@@ -150,7 +152,7 @@ export default function DetailTicket() {
 
         try {
             await fetch(
-                "https://script.google.com/macros/s/AKfycbwBeqKp4Ubfjf6YxvamfKqcHz0Yeapd5p3eJr0yPSdYsDj0yIgi4sn-K7NbcN3K6-Ya/exec",
+                "https://script.google.com/macros/s/AKfycbz5mAyke9tqt6DYWt13o8f5cIo_D4jTFDNkuuvXGi7lP3dqxi1OclBRA2P22UTOZigd/exec",
                 {
                     method: "POST",
                     // mode: "no-cors",

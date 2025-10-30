@@ -89,7 +89,7 @@ export default function NewTicket() {
             }
 
             const res = await fetch(
-                "https://script.google.com/macros/s/AKfycbyLyZNINUF7BEd6KoyGfhn0C6aKBlB22cJ2N_rQKdLk9M-g_15dio8sTRJZ16PK03OmCA/exec",
+                "https://script.google.com/macros/s/AKfycbyw6sR7sEJD4Bsb2lmNSt9qPoqnCTy8kzWuKKc4vRPtbEvJ80xz9nQgMTkc_aKXPpalCw/exec",
                 {
                     method: "POST",
                     // headers: { "Content-Type": "application/json" },
