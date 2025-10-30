@@ -10,7 +10,7 @@ export default function DetailTicket() {
     const [loading, setLoading] = useState(true);
     const [chat, setChat] = useState([]);
     const [statusTicket, setStatusTicket] = useState("");
-    const [statusEskalasi, setStatusEskalasi] = useState("");
+    const [statusSolved, setStatusSolved] = useState("");
     const [reasonReject, setReasonReject] = useState("");
     const [message, setMessage] = useState("");
     const [file, setFile] = useState(null);
@@ -25,7 +25,7 @@ export default function DetailTicket() {
         async function fetchTicket() {
             try {
                 const res = await fetch(
-                    `https://script.google.com/macros/s/AKfycbz5mAyke9tqt6DYWt13o8f5cIo_D4jTFDNkuuvXGi7lP3dqxi1OclBRA2P22UTOZigd/exec?action=getTicket&id=${id}`
+                    `https://script.google.com/macros/s/AKfycbz9wzE8jqaWFSnTESjAY4bz1WKmZma-N8v3FuhdaKANV1Y9o3Tp8_BqfoaduNQeg8Jp/exec?action=getTicket&id=${id}`
                 );
                 const json = await res.json();
                 const dataTicket = json.data;
@@ -43,6 +43,14 @@ export default function DetailTicket() {
         }
         fetchTicket();
     }, [id]);
+
+    // === Autofill dropdown dari tiket ===
+    useEffect(() => {
+        if (ticket) {
+            setStatusTicket(ticket["StatusTicket"] || "");
+            setStatusSolved(ticket["StatusSolved"] || "");
+        }
+    }, [ticket]);
 
     if (loading)
         return (<div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
@@ -64,7 +72,7 @@ export default function DetailTicket() {
                 const base64 = reader.result.split(",")[1];
                 try {
                     const res = await fetch(
-                        "https://script.google.com/macros/s/AKfycbz5mAyke9tqt6DYWt13o8f5cIo_D4jTFDNkuuvXGi7lP3dqxi1OclBRA2P22UTOZigd/exec",
+                        "https://script.google.com/macros/s/AKfycbz9wzE8jqaWFSnTESjAY4bz1WKmZma-N8v3FuhdaKANV1Y9o3Tp8_BqfoaduNQeg8Jp/exec",
                         {
                             method: "POST",
                             // headers: { "Content-Type": "application/json" },
@@ -90,8 +98,8 @@ export default function DetailTicket() {
 
     // === Fungsi submit chat ===
     const handleSubmitChat = async () => {
-        if (!message.trim() && !file) {
-            Swal.fire("Oops", "Isi pesan atau unggah file.", "warning");
+        if (!message.trim()) {
+            Swal.fire("Oops", "Isi pesan dulu", "warning");
             return;
         }
 
@@ -108,7 +116,7 @@ export default function DetailTicket() {
             }
 
             const resChat = await fetch(
-                "https://script.google.com/macros/s/AKfycbz5mAyke9tqt6DYWt13o8f5cIo_D4jTFDNkuuvXGi7lP3dqxi1OclBRA2P22UTOZigd/exec",
+                "https://script.google.com/macros/s/AKfycbz9wzE8jqaWFSnTESjAY4bz1WKmZma-N8v3FuhdaKANV1Y9o3Tp8_BqfoaduNQeg8Jp/exec",
                 {
                     method: "POST",
                     // headers: { "Content-Type": "application/json" },
@@ -150,6 +158,11 @@ export default function DetailTicket() {
 
     // === Fungsi update status (Head Office) ===
     const handleUpdateStatus = async () => {
+        let uploadedFileUrl = "";
+        if (file) {
+            uploadedFileUrl = await uploadFileBase(file, ticket["LinkFolderTicket"]);
+        }
+
         if (statusTicket.toLowerCase() === "reject" && !reasonReject.trim()) {
             Swal.fire("Oops", "Isi reason reject", "warning");
             return;
@@ -162,8 +175,8 @@ export default function DetailTicket() {
         });
 
         try {
-            await fetch(
-                "https://script.google.com/macros/s/AKfycbz5mAyke9tqt6DYWt13o8f5cIo_D4jTFDNkuuvXGi7lP3dqxi1OclBRA2P22UTOZigd/exec",
+            const resUpdate = await fetch(
+                "https://script.google.com/macros/s/AKfycbz9wzE8jqaWFSnTESjAY4bz1WKmZma-N8v3FuhdaKANV1Y9o3Tp8_BqfoaduNQeg8Jp/exec",
                 {
                     method: "POST",
                     // mode: "no-cors",
@@ -171,14 +184,39 @@ export default function DetailTicket() {
                     body: JSON.stringify({
                         action: "updateStatus",
                         ticketId: id,
-                        statusTicket,
-                        statusEskalasi,
-                        reasonReject,
+                        sender: user.name,
+                        senderNIK: "'" + user.nik,
+                        role: user.position,
+                        message,
+                        cabang: user.cabang,
+                        file: uploadedFileUrl,
+                        statusTicket: statusTicket || ticket["StatusTicket"],
+                        statusSolved: statusSolved || ticket["StatusSolved"],
+                        reasonReject: reasonReject || ticket["ReasonReject"],
                     }),
                 }
             );
 
-            Swal.fire("Berhasil", "Status tiket diperbarui", "success");
+            const data = await resUpdate.json();
+            if (data.success) {
+                console.log(data);
+                Swal.fire({
+                    title: "Berhasil!",
+                    text: "Status tiket diperbarui",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    // navigate(`/dashboard/ticket/${id}`);
+                    window.location.href = `/dashboard/ticket/${id}`;
+                });
+
+                setMessage("");
+                setFile(null);
+            } else {
+                Swal.fire("Error", "Gagal kirim chat", "error");
+            }
+
+            // Swal.fire("Berhasil", "Status tiket diperbarui", "success");
         } catch (error) {
             Swal.fire("Error", "Gagal memperbarui status", "error");
             console.error("Gagal memuat tiket:", error);
@@ -364,14 +402,13 @@ export default function DetailTicket() {
                         <div className="mb-3">
                             <label className="block font-medium mb-1">Status Eskalasi</label>
                             <select
-                                value={statusEskalasi}
-                                onChange={(e) => setStatusEskalasi(e.target.value)}
+                                value={statusSolved}
+                                onChange={(e) => setStatusSolved(e.target.value)}
                                 className="border rounded w-full px-3 py-2"
                             >
                                 <option value="">Pilih Status Eskalasi</option>
                                 <option value="marketing">ESKALASI BY MARKETING</option>
                                 <option value="helpdesk">ESKALASI BY IT HELPDESK</option>
-                                <option value="uid">ESKALASI BY UID</option>
                             </select>
                         </div>
 
@@ -408,6 +445,12 @@ export default function DetailTicket() {
                                 onChange={(e) => setMessage(e.target.value)}
                                 className="border rounded w-full px-3 py-2"
                                 rows="4"
+                            />
+                            <input
+                                type="file"
+                                accept="image/*,video/mp4,application/pdf"
+                                onChange={(e) => setFile(e.target.files[0] || null)}
+                                className="border rounded w-full px-3 py-2 mb-3"
                             />
                         </div>
 
