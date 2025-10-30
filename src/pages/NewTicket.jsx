@@ -124,7 +124,19 @@ export default function NewTicket() {
             const json = await res.json();
             if (json.success) {
                 console.log(json);
-                Swal.fire("Berhasil!", "Ticket berhasil dibuat No " + json.ticketId + ".", "success");
+                Swal.fire({
+                    title: "Berhasil!",
+                    text: "Ticket berhasil dibuat No " + json.ticketId + ".",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Arahkan ke halaman Ticket
+                        window.location.href = "/dashboard/ticket";
+                        // atau jika kamu pakai react-router-dom v6:
+                        // navigate("/dashboard/ticket");
+                    }
+                });
                 setForm({
                     product: "",
                     kendalaSystem: "",

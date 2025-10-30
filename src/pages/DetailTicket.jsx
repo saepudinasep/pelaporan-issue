@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+// import { useNavigate } from "react-router-dom";
 
 export default function DetailTicket() {
+    // const navigate = useNavigate();
     const { id } = useParams();
     const [ticket, setTicket] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -125,7 +127,16 @@ export default function DetailTicket() {
 
             const data = await resChat.json();
             if (data.success) {
-                Swal.fire("Berhasil", "Pesan terkirim", "success");
+                Swal.fire({
+                    title: "Berhasil!",
+                    text: "Pesan terkirim.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    // navigate(`/dashboard/ticket/${id}`);
+                    window.location.href = `/dashboard/ticket/${id}`;
+                });
+
                 setMessage("");
                 setFile(null);
             } else {
