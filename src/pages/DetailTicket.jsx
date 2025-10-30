@@ -103,7 +103,7 @@ export default function DetailTicket() {
 
             // Jika user upload file
             if (file) {
-                await uploadFileBase(file, ticket.linkFolderTicket);
+                await uploadFileBase(file, ticket["FileUploadLink"]);
                 uploadedFileUrl = `File: ${file.name}`;
             }
 
@@ -116,7 +116,10 @@ export default function DetailTicket() {
                     body: JSON.stringify({
                         action: "sendChat",
                         ticketId: id,
-                        sender: user.nama,
+                        sender: user.name,
+                        senderNIK: "'" + user.nik,
+                        role: user.position,
+                        cabang: user.cabang,
                         message,
                         file: uploadedFileUrl,
                     }),
@@ -253,6 +256,41 @@ export default function DetailTicket() {
                 </h4>
 
                 <div className="max-h-96 overflow-y-auto border rounded-lg p-4 bg-gray-50 space-y-3">
+                    <div
+                        className={`flex ${ticket["CreatedBy(NIK)"] === user.nik ? "justify-end" : "justify-start"}`}
+                    >
+                        <div
+                            className={`max-w-[75%] p-3 rounded-2xl shadow-sm relative ${ticket["CreatedBy(NIK)"] === user.nik
+                                ? "bg-indigo-500 text-white rounded-tr-none"
+                                : "bg-white text-gray-800 rounded-tl-none"
+                                }`}
+                        >
+                            <p className="text-sm leading-snug wrap-break-word">{ticket["DetailError"]}</p>
+
+                            {ticket["FileUploadLink"] && (
+                                <a
+                                    href={ticket["FileUploadLink"]}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className={`block mt-1 text-xs underline ${ticket["CreatedBy(NIK)"] === user.nik ? "text-indigo-200" : "text-blue-500"
+                                        }`}
+                                >
+                                    📎 Lihat File
+                                </a>
+                            )}
+
+                            <div
+                                className={`text-[10px] mt-1 ${ticket["CreatedBy(NIK)"] === user.nik ? "text-indigo-200 text-right" : "text-gray-400"
+                                    }`}
+                            >
+                                {ticket["CreatedBy(Name)"]} •{" "}
+                                {new Date(ticket["Timestamp"]).toLocaleString("id-ID", {
+                                    dateStyle: "short",
+                                    timeStyle: "short",
+                                })}
+                            </div>
+                        </div>
+                    </div>
                     {chat.length > 0 ? (
                         chat.map((c, i) => {
                             const isUser = c.senderNIK === user.nik;
@@ -297,7 +335,7 @@ export default function DetailTicket() {
                         })
                     ) : (
                         <div className="text-gray-500 text-center text-sm py-10">
-                            Belum ada percakapan.
+                            {/* Belum ada percakapan. */}
                         </div>
                     )}
                 </div>

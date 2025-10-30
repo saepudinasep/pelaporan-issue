@@ -66,10 +66,10 @@ export default function NewTicket() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!form.product || !form.kendalaSystem || !form.issueSummary) {
-            Swal.fire("Oops!", "Lengkapi data wajib terlebih dahulu.", "warning");
-            return;
-        }
+        // if (!form.product || !form.kendalaSystem || !form.issueSummary) {
+        //     Swal.fire("Oops!", "Lengkapi data wajib terlebih dahulu.", "warning");
+        //     return;
+        // }
 
         setLoading(true);
         Swal.fire({
@@ -97,7 +97,7 @@ export default function NewTicket() {
                         action: "createTicket",
                         region: user.region || "-",
                         branch: user.cabang || "-",
-                        product: form.product,
+                        product: form.product || user.product,
                         picInput: user.name || "-",
                         kendalaSystem: form.kendalaSystem,
                         subKendala: form.subKendala,
@@ -168,7 +168,7 @@ export default function NewTicket() {
 
                     <div className="grid md:grid-cols-2 gap-4">
                         {/* Product */}
-                        <div>
+                        <div hidden={user.product !== "ALL BRAND"}>
                             <label className="block text-sm font-medium mb-1">Product</label>
                             <select
                                 name="product"

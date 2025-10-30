@@ -13,6 +13,8 @@ export default function Ticket() {
         const storedUser = JSON.parse(localStorage.getItem("userData"));
         if (storedUser) setUserData(storedUser);
 
+        console.log(storedUser);
+
         const fetchTickets = async () => {
             try {
                 const res = await fetch(API_URL);
@@ -23,6 +25,7 @@ export default function Ticket() {
                     setLoading(false);
                     return;
                 }
+                console.log(json.data);
 
                 // Map data supaya cocok format TicketTable
                 const mapped = json.data.map((row) => ({
@@ -35,7 +38,7 @@ export default function Ticket() {
                     brand: row["Brand"] || "-",
                     region: row["Region"] || "-",
                     cabang: row["Cabang"] || "-",
-                    nik: row["NIK"] || "-",
+                    nik: row["Created By (NIK)"] || "-",
                 }));
 
                 let filteredTickets = mapped;
@@ -81,6 +84,8 @@ export default function Ticket() {
                                     t.nik?.toString().trim() ===
                                     storedUser.nik?.toString().trim()
                             );
+                            console.log(storedUser.nik.toString().trim());
+                            console.log(filteredTickets);
                             break;
 
                         case "HO":
@@ -111,9 +116,9 @@ export default function Ticket() {
 
     if (loading)
         return (
-            <p className="text-center py-6 text-gray-600 font-medium">
-                Memuat tiket...
-            </p>
+            <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[9999]">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-500 border-t-transparent"></div>
+            </div>
         );
 
     return (
