@@ -8,14 +8,22 @@ import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("loggedIn") === "true"
-  );
-  const [userData, setUserData] = useState(
-    JSON.parse(localStorage.getItem("userData")) || null
-  );
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Pastikan state sinkron dengan localStorage
+  // Ambil data login dari localStorage setelah komponen mount
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("loggedIn") === "true";
+    const storedUser = JSON.parse(localStorage.getItem("userData"));
+    if (loggedIn && storedUser) {
+      setIsLoggedIn(true);
+      setUserData(storedUser);
+    }
+    setLoading(false);
+  }, []);
+
+  // Sinkronisasi kembali ke localStorage jika user berubah
   useEffect(() => {
     if (isLoggedIn) {
       localStorage.setItem("loggedIn", "true");
@@ -25,6 +33,9 @@ export default function App() {
       localStorage.removeItem("userData");
     }
   }, [isLoggedIn, userData]);
+
+  // Saat loading, jangan render apapun dulu (hindari redirect tiba-tiba)
+  if (loading) return <div className="text-center mt-10">Loading...</div>;
 
   return (
     <Routes>

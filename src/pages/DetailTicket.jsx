@@ -208,6 +208,8 @@ export default function DetailTicket() {
                 }).then(() => {
                     // navigate(`/dashboard/ticket/${id}`);
                     window.location.href = `/dashboard/ticket/${id}`;
+                    // navigate(`/dashboard/ticket/${id}`);
+                    // console.log("Router aktif:", navigate);
                 });
 
                 setMessage("");
