@@ -212,6 +212,9 @@ export default function TicketTable({ tickets, userData }) {
                             {isHeadOffice && (
                                 <th className="px-4 py-3 text-left">Brand</th>
                             )}
+                            {isHeadOffice && (
+                                <th className="px-4 py-3 text-left">Region</th>
+                            )}
                             <th className="px-4 py-3 text-left">Status</th>
                         </tr>
                     </thead>
@@ -246,6 +249,11 @@ export default function TicketTable({ tickets, userData }) {
                                     {isHeadOffice && (
                                         <td className="px-4 py-2">
                                             {ticket.brand || "-"}
+                                        </td>
+                                    )}
+                                    {isHeadOffice && (
+                                        <td className="px-4 py-2">
+                                            {ticket.region || "-"}
                                         </td>
                                     )}
                                     <td className="px-4 py-2">
