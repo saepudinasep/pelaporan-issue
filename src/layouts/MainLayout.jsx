@@ -10,19 +10,39 @@ import Panduan from "../pages/Panduan";
 import Setting from "../pages/Setting";
 
 export default function MainLayout({ userData, setIsLoggedIn }) {
+    // console.log("User Data", userData);
+    // console.log("setIsLoggedIn", setIsLoggedIn);
+    // if (!userData) {
+    //     // Tambahkan fallback agar tidak error kalau userData belum sempat diload
+    //     return (
+    //         <div className="flex items-center justify-center min-h-screen">
+    //             <p className="text-gray-500">Memuat data pengguna...</p>
+    //             ${userData}
+    //         </div>
+    //     );
+    // }
+
     return (
         <div className="min-h-screen flex flex-col">
+            {/* Header */}
             <TopBar userData={userData} setIsLoggedIn={setIsLoggedIn} />
+
+            {/* Sidebar / Navbar */}
             <Navbar userData={userData} />
-            <main className="flex-1 p-6 bg-gray-100">
+
+            {/* Konten utama */}
+            <main className="flex-1 p-6 bg-gray-100 overflow-auto">
                 <Routes>
-                    <Route index element={<Dashboard />} />
-                    <Route path="ticket" element={<Ticket />} />
-                    <Route path="ticket/new" element={<NewTicket />} />
-                    <Route path="ticket/:id" element={<DetailTicket />} />
-                    <Route path="report" element={<Report />} />
-                    <Route path="panduan" element={<Panduan />} />
-                    <Route path="setting" element={<Setting userData={userData} setIsLoggedIn={setIsLoggedIn} />} />
+                    <Route index element={<Dashboard user={userData} />} />
+                    <Route path="ticket" element={<Ticket user={userData} />} />
+                    <Route path="ticket/new" element={<NewTicket user={userData} />} />
+                    <Route path="ticket/:id" element={<DetailTicket user={userData} />} />
+                    <Route path="report" element={<Report user={userData} />} />
+                    <Route path="panduan" element={<Panduan user={userData} />} />
+                    <Route
+                        path="setting"
+                        element={<Setting userData={userData} setIsLoggedIn={setIsLoggedIn} />}
+                    />
                 </Routes>
             </main>
 
