@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Select from "react-select";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
@@ -14,14 +15,24 @@ export default function TicketTable({ tickets, userData }) {
 
     const isHeadOffice = userData?.cabang === "Kantor Pusat";
 
-    // 🔍 Daftar Region & Brand unik dari data tiket
-    const allRegions = [...new Set(tickets.map((t) => t.region).filter(Boolean))];
-    const allBrands = [...new Set(tickets.map((t) => t.brand).filter(Boolean))];
+    const allRegions = [
+        "BU XV - KALIMANTAN",
+        "BU IX - SULAWESI",
+        "BU VI - JATIM BALI",
+        "BU III - JAWA BARAT",
+        "BU I - JABODEBEK",
+        "BU XIII - BANTEN",
+        "BU XIV - JATENG UTARA",
+        "BU V - JATENG SELATAN",
+        "BU VII - SUMBAGUT",
+        "BU VIII - SUMBAGSEL",
+    ];
+
+    const allBrands = ["HAJIKU", "MASKU", "MOBILKU", "MOTORKU", "REGULER"];
 
     useEffect(() => {
         let filtered = tickets;
 
-        // Filter Ticket ID
         if (searchInput.trim() !== "") {
             if (!/^\d+$/.test(searchInput)) {
                 Swal.fire({
@@ -38,7 +49,6 @@ export default function TicketTable({ tickets, userData }) {
             }
         }
 
-        // Filter status
         if (statusFilter !== "All") {
             filtered = filtered.filter(
                 (t) =>
@@ -47,21 +57,16 @@ export default function TicketTable({ tickets, userData }) {
             );
         }
 
-        // Filter region
         if (regionFilter.length > 0) {
-            filtered = filtered.filter((t) =>
-                regionFilter.includes(t.region)
-            );
+            const regions = regionFilter.map((r) => r.value);
+            filtered = filtered.filter((t) => regions.includes(t.region));
         }
 
-        // Filter brand
         if (brandFilter.length > 0) {
-            filtered = filtered.filter((t) =>
-                brandFilter.includes(t.brand)
-            );
+            const brands = brandFilter.map((b) => b.value);
+            filtered = filtered.filter((t) => brands.includes(t.brand));
         }
 
-        // Urutkan berdasarkan tanggal terbaru
         filtered.sort((a, b) => {
             const [dayA, monthA, yearA] = a.createDate.split("/");
             const [dayB, monthB, yearB] = b.createDate.split("/");
@@ -97,74 +102,20 @@ export default function TicketTable({ tickets, userData }) {
         navigate(`/dashboard/ticket/${ticketId}`);
     };
 
-    // 🔍 Dialog filter lanjutan (multi-select modern)
-    const openFilterDialog = () => {
-        Swal.fire({
-            title: "Advanced Search",
-            html: `
-            <div class="text-left">
-                <label class="font-semibold text-sm">Pilih Region:</label>
-                <div id="region-container" class="border rounded-lg p-2 mb-3 max-h-40 overflow-y-auto bg-gray-50">
-                    ${allRegions
-                    .map(
-                        (region) => `
-                        <label class="flex items-center gap-2 text-sm py-1">
-                            <input type="checkbox" value="${region}" ${regionFilter.includes(region) ? "checked" : ""
-                            } class="region-checkbox accent-blue-500" />
-                            ${region}
-                        </label>`
-                    )
-                    .join("")}
-                </div>
-                <label class="font-semibold text-sm">Pilih Brand:</label>
-                <div id="brand-container" class="border rounded-lg p-2 mb-3 max-h-40 overflow-y-auto bg-gray-50">
-                    ${allBrands
-                    .map(
-                        (brand) => `
-                        <label class="flex items-center gap-2 text-sm py-1">
-                            <input type="checkbox" value="${brand}" ${brandFilter.includes(brand) ? "checked" : ""
-                            } class="brand-checkbox accent-blue-500" />
-                            ${brand}
-                        </label>`
-                    )
-                    .join("")}
-                </div>
-            </div>`,
-            showCancelButton: true,
-            confirmButtonText: "Terapkan",
-            cancelButtonText: "Batal",
-            showDenyButton: true,
-            denyButtonText: "Reset",
-            confirmButtonColor: "#2563eb",
-            denyButtonColor: "#d1d5db",
-            preConfirm: () => {
-                const selectedRegions = Array.from(
-                    document.querySelectorAll(".region-checkbox:checked")
-                ).map((el) => el.value);
-                const selectedBrands = Array.from(
-                    document.querySelectorAll(".brand-checkbox:checked")
-                ).map((el) => el.value);
-                return { selectedRegions, selectedBrands };
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setRegionFilter(result.value.selectedRegions);
-                setBrandFilter(result.value.selectedBrands);
-                Swal.fire("Berhasil!", "Filter diterapkan.", "success");
-            } else if (result.isDenied) {
-                setRegionFilter([]);
-                setBrandFilter([]);
-                Swal.fire("Reset!", "Filter dihapus.", "info");
-            }
-        });
+    const resetFilters = () => {
+        setRegionFilter([]);
+        setBrandFilter([]);
+        setStatusFilter("All");
+        setSearchInput("");
+        Swal.fire("Reset!", "Semua filter telah dihapus.", "info");
     };
 
     return (
         <div className="space-y-4">
             <h3 className="text-xl font-semibold">📂 Daftar Tiket</h3>
 
-            {/* Search & Status Filter */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            {/* Filter Section */}
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <input
                     type="text"
                     placeholder="Cari Ticket ID"
@@ -172,14 +123,8 @@ export default function TicketTable({ tickets, userData }) {
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                 />
-                <div className="flex flex-wrap gap-2">
-                    {/* Tombol Filter Lanjutan */}
-                    <button
-                        onClick={openFilterDialog}
-                        className="px-4 py-1 rounded-full text-sm sm:text-xs font-medium bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
-                    >
-                        Advanced Search
-                    </button>
+
+                <div className="flex flex-wrap gap-2 items-center">
                     {["Open", "Closed", "Reject", "All"].map((status) => (
                         <button
                             key={status}
@@ -193,32 +138,81 @@ export default function TicketTable({ tickets, userData }) {
                         </button>
                     ))}
 
-
+                    <button
+                        onClick={resetFilters}
+                        className="px-4 py-1 rounded-full text-sm sm:text-xs font-medium bg-gray-200 hover:bg-gray-300 transition"
+                    >
+                        Reset
+                    </button>
                 </div>
             </div>
+            {/* Multi-select modern */}
+            {isHeadOffice && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Region
+                        </label>
+                        <Select
+                            isMulti
+                            options={allRegions.map((r) => ({
+                                value: r,
+                                label: r,
+                            }))}
+                            value={regionFilter}
+                            onChange={setRegionFilter}
+                            className="text-sm"
+                            placeholder="Pilih region..."
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "0.5rem",
+                                    borderColor: "#cbd5e1",
+                                    minHeight: "40px",
+                                }),
+                            }}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Brand
+                        </label>
+                        <Select
+                            isMulti
+                            options={allBrands.map((b) => ({
+                                value: b,
+                                label: b,
+                            }))}
+                            value={brandFilter}
+                            onChange={setBrandFilter}
+                            className="text-sm"
+                            placeholder="Pilih brand..."
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "0.5rem",
+                                    borderColor: "#cbd5e1",
+                                    minHeight: "40px",
+                                }),
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* Table */}
-            <div className="overflow-x-auto rounded shadow-sm">
+            <div className="overflow-x-auto rounded shadow-sm mt-4">
                 <table className="min-w-full divide-y divide-gray-200 text-sm sm:text-xs">
-                    <thead className="bg-gray-200 sticky top-0 z-10">
+                    <thead className="bg-gray-200">
                         <tr>
-                            <th className="px-4 py-3 text-left font-medium text-gray-700 uppercase tracking-wider">
-                                Create Date
-                            </th>
-                            <th className="px-4 py-3 text-left font-medium text-gray-700 uppercase tracking-wider">
-                                Ticket
-                            </th>
-                            <th className="px-4 py-3 text-left font-medium text-gray-700 uppercase tracking-wider">
-                                Error System
-                            </th>
+                            <th className="px-4 py-3 text-left">Create Date</th>
+                            <th className="px-4 py-3 text-left">Ticket</th>
+                            <th className="px-4 py-3 text-left">Error System</th>
                             {isHeadOffice && (
-                                <th className="px-4 py-3 text-left font-medium text-gray-700 uppercase tracking-wider">
-                                    Brand
-                                </th>
+                                <th className="px-4 py-3 text-left">Brand</th>
                             )}
-                            <th className="px-4 py-3 text-left font-medium text-gray-700 uppercase tracking-wider">
-                                Status
-                            </th>
+                            <th className="px-4 py-3 text-left">Status</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -235,7 +229,7 @@ export default function TicketTable({ tickets, userData }) {
                             pageTickets.map((ticket) => (
                                 <tr
                                     key={ticket.ticketId}
-                                    className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+                                    className="hover:bg-gray-50 cursor-pointer"
                                     onClick={() =>
                                         handleRowClick(ticket.ticketId)
                                     }
@@ -243,7 +237,7 @@ export default function TicketTable({ tickets, userData }) {
                                     <td className="px-4 py-2">
                                         {ticket.createDate || "-"}
                                     </td>
-                                    <td className="px-4 py-2 font-medium text-blue-600">
+                                    <td className="px-4 py-2 text-blue-600 font-medium">
                                         {ticket.ticketId}
                                     </td>
                                     <td className="px-4 py-2">
@@ -276,7 +270,7 @@ export default function TicketTable({ tickets, userData }) {
                     {Array.from({ length: totalPages }, (_, i) => (
                         <button
                             key={i + 1}
-                            className={`px-3 py-1 rounded-full text-sm sm:text-xs border transition-colors duration-200 ${currentPage === i + 1
+                            className={`px-3 py-1 rounded-full text-sm border ${currentPage === i + 1
                                 ? "bg-blue-500 text-white border-blue-500"
                                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                                 }`}
