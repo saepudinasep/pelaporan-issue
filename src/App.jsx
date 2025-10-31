@@ -39,10 +39,16 @@ export default function App() {
 
   return (
     <Routes>
-      <Route
+      {/* <Route
         path="/"
         element={
           isLoggedIn ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+        }
+      /> */}
+      <Route
+        path="/"
+        element={
+          isLoggedIn ? <Navigate to="/dashboard/ticket" /> : <Navigate to="/login" />
         }
       />
 

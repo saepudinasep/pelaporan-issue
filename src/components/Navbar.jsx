@@ -35,14 +35,14 @@ export default function Navbar({ userData }) {
 
     const navItems = isHeadOffice
         ? [
-            { name: "Dashboard", path: "/dashboard" },
+            // { name: "Dashboard", path: "/dashboard" },
             { name: "Ticket", path: "/dashboard/ticket" },
             { name: "Report", path: "/dashboard/report" },
             { name: "Panduan", path: "/dashboard/panduan" },
             { name: "Setting", path: "/dashboard/setting" },
         ]
         : [
-            { name: "Dashboard", path: "/dashboard" },
+            // { name: "Dashboard", path: "/dashboard" },
             { name: "Ticket", path: "/dashboard/ticket" },
             { name: "New Ticket", path: "/dashboard/ticket/new" },
             { name: "Panduan", path: "/dashboard/panduan" },
@@ -54,15 +54,15 @@ export default function Navbar({ userData }) {
     return (
         <nav
             className={`sticky top-0 z-50 transition-all duration-300 backdrop-blur-md ${isScrolled
-                    ? "bg-white/70 shadow-sm border-b border-gray-200"
-                    : "bg-white"
+                ? "bg-white/70 shadow-sm border-b border-gray-200"
+                : "bg-white"
                 }`}
         >
             <div className="flex justify-between items-center px-6 py-4 md:justify-center">
                 <div className="md:hidden">
                     <h1
                         className="text-blue-600 font-bold text-lg cursor-pointer"
-                        onClick={() => navigate("/dashboard")}
+                        onClick={() => navigate("/dashboard/ticket")}
                     >
                         WOM Finance
                     </h1>
@@ -81,8 +81,8 @@ export default function Navbar({ userData }) {
                             key={item.path}
                             onClick={() => navigate(item.path)}
                             className={`cursor-pointer px-3 py-1.5 text-lg font-medium transition-all duration-200 ${isActive(item.path)
-                                    ? "text-blue-600 border-b-2 border-blue-600"
-                                    : "text-gray-800 hover:text-blue-500 hover:border-b-2 hover:border-blue-300"
+                                ? "text-blue-600 border-b-2 border-blue-600"
+                                : "text-gray-800 hover:text-blue-500 hover:border-b-2 hover:border-blue-300"
                                 }`}
                         >
                             {item.name}
@@ -101,8 +101,8 @@ export default function Navbar({ userData }) {
                                 setMenuOpen(false);
                             }}
                             className={`cursor-pointer w-full text-center py-2 text-lg font-medium transition-colors duration-200 ${isActive(item.path)
-                                    ? "text-blue-600 bg-blue-50"
-                                    : "text-gray-800 hover:text-blue-500 hover:bg-gray-100"
+                                ? "text-blue-600 bg-blue-50"
+                                : "text-gray-800 hover:text-blue-500 hover:bg-gray-100"
                                 }`}
                         >
                             {item.name}

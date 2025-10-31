@@ -205,7 +205,8 @@ export default function Login() {
 
     useEffect(() => {
         if (localStorage.getItem("loggedIn") === "true") {
-            navigate("/dashboard");
+            // navigate("/dashboard");
+            navigate("/dashboard/ticket");
         }
     }, [navigate]);
 
@@ -278,7 +279,8 @@ export default function Login() {
                 showConfirmButton: false,
             });
 
-            setTimeout(() => navigate("/dashboard"), 1500);
+            // setTimeout(() => navigate("/dashboard"), 1500);
+            setTimeout(() => navigate("/dashboard/ticket"), 1500);
         } catch (err) {
             console.error("Error login:", err);
             setLoading(false);

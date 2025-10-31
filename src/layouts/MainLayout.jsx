@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import Navbar from "../components/Navbar";
-import Dashboard from "../pages/Dashboard";
+// import Dashboard from "../pages/Dashboard";
 import Ticket from "../pages/Ticket";
 import NewTicket from "../pages/NewTicket";
 import DetailTicket from "../pages/DetailTicket";
@@ -33,7 +33,7 @@ export default function MainLayout({ userData, setIsLoggedIn }) {
             {/* Konten utama */}
             <main className="flex-1 p-6 bg-gray-100 overflow-auto">
                 <Routes>
-                    <Route index element={<Dashboard user={userData} />} />
+                    {/* <Route index element={<Dashboard user={userData} />} /> */}
                     <Route path="ticket" element={<Ticket user={userData} />} />
                     <Route path="ticket/new" element={<NewTicket user={userData} />} />
                     <Route path="ticket/:id" element={<DetailTicket user={userData} />} />
