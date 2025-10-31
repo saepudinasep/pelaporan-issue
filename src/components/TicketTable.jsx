@@ -7,15 +7,21 @@ export default function TicketTable({ tickets, userData }) {
     const [filteredTickets, setFilteredTickets] = useState([]);
     const [searchInput, setSearchInput] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
+    const [regionFilter, setRegionFilter] = useState([]);
+    const [brandFilter, setBrandFilter] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
     const isHeadOffice = userData?.cabang === "Kantor Pusat";
 
+    // 🔍 Daftar Region & Brand unik dari data tiket
+    const allRegions = [...new Set(tickets.map((t) => t.region).filter(Boolean))];
+    const allBrands = [...new Set(tickets.map((t) => t.brand).filter(Boolean))];
+
     useEffect(() => {
         let filtered = tickets;
 
-        // Filter berdasarkan Ticket ID
+        // Filter Ticket ID
         if (searchInput.trim() !== "") {
             if (!/^\d+$/.test(searchInput)) {
                 Swal.fire({
@@ -41,7 +47,21 @@ export default function TicketTable({ tickets, userData }) {
             );
         }
 
-        // Urutkan dari tanggal terbaru
+        // Filter region
+        if (regionFilter.length > 0) {
+            filtered = filtered.filter((t) =>
+                regionFilter.includes(t.region)
+            );
+        }
+
+        // Filter brand
+        if (brandFilter.length > 0) {
+            filtered = filtered.filter((t) =>
+                brandFilter.includes(t.brand)
+            );
+        }
+
+        // Urutkan berdasarkan tanggal terbaru
         filtered.sort((a, b) => {
             const [dayA, monthA, yearA] = a.createDate.split("/");
             const [dayB, monthB, yearB] = b.createDate.split("/");
@@ -50,11 +70,9 @@ export default function TicketTable({ tickets, userData }) {
             return dateB - dateA;
         });
 
-        console.log(filtered);
-
         setFilteredTickets(filtered);
         setCurrentPage(1);
-    }, [tickets, searchInput, statusFilter]);
+    }, [tickets, searchInput, statusFilter, regionFilter, brandFilter]);
 
     const totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
     const pageTickets = filteredTickets.slice(
@@ -75,9 +93,70 @@ export default function TicketTable({ tickets, userData }) {
         }
     };
 
-    // 👉 Fungsi navigasi ke detail ticket
     const handleRowClick = (ticketId) => {
         navigate(`/dashboard/ticket/${ticketId}`);
+    };
+
+    // 🔍 Dialog filter lanjutan (multi-select modern)
+    const openFilterDialog = () => {
+        Swal.fire({
+            title: "Advanced Search",
+            html: `
+            <div class="text-left">
+                <label class="font-semibold text-sm">Pilih Region:</label>
+                <div id="region-container" class="border rounded-lg p-2 mb-3 max-h-40 overflow-y-auto bg-gray-50">
+                    ${allRegions
+                    .map(
+                        (region) => `
+                        <label class="flex items-center gap-2 text-sm py-1">
+                            <input type="checkbox" value="${region}" ${regionFilter.includes(region) ? "checked" : ""
+                            } class="region-checkbox accent-blue-500" />
+                            ${region}
+                        </label>`
+                    )
+                    .join("")}
+                </div>
+                <label class="font-semibold text-sm">Pilih Brand:</label>
+                <div id="brand-container" class="border rounded-lg p-2 mb-3 max-h-40 overflow-y-auto bg-gray-50">
+                    ${allBrands
+                    .map(
+                        (brand) => `
+                        <label class="flex items-center gap-2 text-sm py-1">
+                            <input type="checkbox" value="${brand}" ${brandFilter.includes(brand) ? "checked" : ""
+                            } class="brand-checkbox accent-blue-500" />
+                            ${brand}
+                        </label>`
+                    )
+                    .join("")}
+                </div>
+            </div>`,
+            showCancelButton: true,
+            confirmButtonText: "Terapkan",
+            cancelButtonText: "Batal",
+            showDenyButton: true,
+            denyButtonText: "Reset",
+            confirmButtonColor: "#2563eb",
+            denyButtonColor: "#d1d5db",
+            preConfirm: () => {
+                const selectedRegions = Array.from(
+                    document.querySelectorAll(".region-checkbox:checked")
+                ).map((el) => el.value);
+                const selectedBrands = Array.from(
+                    document.querySelectorAll(".brand-checkbox:checked")
+                ).map((el) => el.value);
+                return { selectedRegions, selectedBrands };
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setRegionFilter(result.value.selectedRegions);
+                setBrandFilter(result.value.selectedBrands);
+                Swal.fire("Berhasil!", "Filter diterapkan.", "success");
+            } else if (result.isDenied) {
+                setRegionFilter([]);
+                setBrandFilter([]);
+                Swal.fire("Reset!", "Filter dihapus.", "info");
+            }
+        });
     };
 
     return (
@@ -94,6 +173,13 @@ export default function TicketTable({ tickets, userData }) {
                     onChange={(e) => setSearchInput(e.target.value)}
                 />
                 <div className="flex flex-wrap gap-2">
+                    {/* Tombol Filter Lanjutan */}
+                    <button
+                        onClick={openFilterDialog}
+                        className="px-4 py-1 rounded-full text-sm sm:text-xs font-medium bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
+                    >
+                        Advanced Search
+                    </button>
                     {["Open", "Closed", "Reject", "All"].map((status) => (
                         <button
                             key={status}
@@ -106,6 +192,8 @@ export default function TicketTable({ tickets, userData }) {
                             {status}
                         </button>
                     ))}
+
+
                 </div>
             </div>
 
@@ -148,7 +236,9 @@ export default function TicketTable({ tickets, userData }) {
                                 <tr
                                     key={ticket.ticketId}
                                     className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-                                    onClick={() => handleRowClick(ticket.ticketId)} // ✅ Navigasi ke detail
+                                    onClick={() =>
+                                        handleRowClick(ticket.ticketId)
+                                    }
                                 >
                                     <td className="px-4 py-2">
                                         {ticket.createDate || "-"}
